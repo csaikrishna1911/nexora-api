@@ -3,7 +3,10 @@ from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.schemas.common import ResponseEnvelope, PaginatedData
+from app.schemas.common import (
+    ResponseEnvelope, PaginatedData,
+    RESPONSES_404_PROJECT, RESPONSES_404_OWNER, RESPONSES_422, RESPONSES_500
+)
 from app.schemas.project import ProjectCreate, ProjectUpdate, ProjectResponse, ProjectDetailResponse, TaskStats
 from app.services.project_service import ProjectService
 from app.utils.pagination import build_paginated_response
@@ -16,7 +19,12 @@ router = APIRouter(prefix="/api/v1/projects", tags=["Projects"])
     response_model=ResponseEnvelope[ProjectResponse],
     status_code=status.HTTP_201_CREATED,
     summary="Create a project",
-    description="Creates a new project owned by a valid user."
+    description="Creates a new project owned by a valid user.",
+    responses={
+        404: RESPONSES_404_OWNER,
+        422: RESPONSES_422,
+        500: RESPONSES_500
+    }
 )
 def create_project(
     project_in: ProjectCreate,
@@ -31,7 +39,11 @@ def create_project(
     response_model=ResponseEnvelope[PaginatedData[ProjectResponse]],
     status_code=status.HTTP_200_OK,
     summary="Get paginated projects",
-    description="Retrieves projects with filtering, searching, sorting, and pagination."
+    description="Retrieves projects with filtering, searching, sorting, and pagination.",
+    responses={
+        422: RESPONSES_422,
+        500: RESPONSES_500
+    }
 )
 def get_projects(
     page: int = Query(1, ge=1, description="Page number"),
@@ -54,7 +66,12 @@ def get_projects(
     response_model=ResponseEnvelope[ProjectDetailResponse],
     status_code=status.HTTP_200_OK,
     summary="Get project by ID",
-    description="Retrieves a project by ID along with its task statistics breakdown."
+    description="Retrieves a project by ID along with its task statistics breakdown.",
+    responses={
+        404: RESPONSES_404_PROJECT,
+        422: RESPONSES_422,
+        500: RESPONSES_500
+    }
 )
 def get_project(
     project_id: int,
@@ -80,7 +97,12 @@ def get_project(
     response_model=ResponseEnvelope[ProjectResponse],
     status_code=status.HTTP_200_OK,
     summary="Update project",
-    description="Updates project name or description."
+    description="Updates project name or description.",
+    responses={
+        404: RESPONSES_404_PROJECT,
+        422: RESPONSES_422,
+        500: RESPONSES_500
+    }
 )
 def update_project(
     project_id: int,
@@ -95,7 +117,11 @@ def update_project(
     "/{project_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Delete project",
-    description="Deletes a project and all associated tasks."
+    description="Deletes a project and all associated tasks.",
+    responses={
+        404: RESPONSES_404_PROJECT,
+        500: RESPONSES_500
+    }
 )
 def delete_project(
     project_id: int,

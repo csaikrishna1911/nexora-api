@@ -3,7 +3,10 @@ from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.schemas.common import ResponseEnvelope, PaginatedData
+from app.schemas.common import (
+    ResponseEnvelope, PaginatedData,
+    RESPONSES_404_TASK, RESPONSES_404_PROJECT, RESPONSES_422, RESPONSES_500
+)
 from app.schemas.task import (
     TaskCreate, TaskUpdate, TaskStatusUpdate, TaskResponse, TaskStatusEnum, TaskPriorityEnum
 )
@@ -18,7 +21,12 @@ router = APIRouter(prefix="/api/v1/tasks", tags=["Tasks"])
     response_model=ResponseEnvelope[TaskResponse],
     status_code=status.HTTP_201_CREATED,
     summary="Create a task",
-    description="Creates a task within a specified project, optionally assigning to a user."
+    description="Creates a task within a specified project, optionally assigning to a user.",
+    responses={
+        404: RESPONSES_404_PROJECT,
+        422: RESPONSES_422,
+        500: RESPONSES_500
+    }
 )
 def create_task(
     task_in: TaskCreate,
@@ -33,7 +41,11 @@ def create_task(
     response_model=ResponseEnvelope[PaginatedData[TaskResponse]],
     status_code=status.HTTP_200_OK,
     summary="Get paginated tasks",
-    description="Retrieves tasks with filtering (project, assignee, status, priority), search, and pagination."
+    description="Retrieves tasks with filtering (project, assignee, status, priority), search, and pagination.",
+    responses={
+        422: RESPONSES_422,
+        500: RESPONSES_500
+    }
 )
 def get_tasks(
     page: int = Query(1, ge=1, description="Page number"),
@@ -70,7 +82,12 @@ def get_tasks(
     response_model=ResponseEnvelope[TaskResponse],
     status_code=status.HTTP_200_OK,
     summary="Get task by ID",
-    description="Retrieves detailed information for a specific task."
+    description="Retrieves detailed information for a specific task.",
+    responses={
+        404: RESPONSES_404_TASK,
+        422: RESPONSES_422,
+        500: RESPONSES_500
+    }
 )
 def get_task(
     task_id: int,
@@ -85,7 +102,12 @@ def get_task(
     response_model=ResponseEnvelope[TaskResponse],
     status_code=status.HTTP_200_OK,
     summary="Update task details",
-    description="Partially updates task fields (title, description, assignee_id, priority, due_date, status)."
+    description="Partially updates task fields (title, description, assignee_id, priority, due_date, status).",
+    responses={
+        404: RESPONSES_404_TASK,
+        422: RESPONSES_422,
+        500: RESPONSES_500
+    }
 )
 def update_task(
     task_id: int,
@@ -101,7 +123,12 @@ def update_task(
     response_model=ResponseEnvelope[TaskResponse],
     status_code=status.HTTP_200_OK,
     summary="Update task status",
-    description="Updates only the execution status of a task (todo, in-progress, done)."
+    description="Updates only the execution status of a task (todo, in-progress, done).",
+    responses={
+        404: RESPONSES_404_TASK,
+        422: RESPONSES_422,
+        500: RESPONSES_500
+    }
 )
 def update_task_status(
     task_id: int,
@@ -116,7 +143,11 @@ def update_task_status(
     "/{task_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Delete task",
-    description="Deletes a task by ID."
+    description="Deletes a task by ID.",
+    responses={
+        404: RESPONSES_404_TASK,
+        500: RESPONSES_500
+    }
 )
 def delete_task(
     task_id: int,

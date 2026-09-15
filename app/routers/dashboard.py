@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.schemas.common import ResponseEnvelope
+from app.schemas.common import ResponseEnvelope, RESPONSES_500
 from app.schemas.dashboard import DashboardSummary
 from app.services.dashboard_service import DashboardService
 
@@ -14,7 +14,10 @@ router = APIRouter(prefix="/api/v1/dashboard", tags=["Dashboard"])
     response_model=ResponseEnvelope[DashboardSummary],
     status_code=status.HTTP_200_OK,
     summary="Get dashboard summary analytics",
-    description="Provides real-time aggregated system analytics: total users, projects, tasks, and task breakdown by status and priority."
+    description="Provides real-time aggregated system analytics: total users, projects, tasks, and task breakdown by status and priority.",
+    responses={
+        500: RESPONSES_500
+    }
 )
 def get_dashboard_summary(
     db: Session = Depends(get_db)
